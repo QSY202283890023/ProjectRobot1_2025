@@ -2,26 +2,49 @@
   "001": {
     "product_id": "001",
     "name": "Apple",
-    "price": 1.5,
-    "stock": 100
+    "price": 5.0,
+    "stock": 98
   },
   "002": {
     "product_id": "002",
     "name": "Banana",
-    "price": 0.75,
+    "price": 3.0,
     "stock": 150
   },
   "003": {
     "product_id": "003",
     "name": "Orange",
-    "price": 1.2,
+    "price": 4.5,
     "stock": 80
   },
   "004": {
     "product_id": "004",
-    "name": "Milk",
-    "price": 2.5,
+    "name": "Mile",
+    "price": 8.0,
     "stock": 50
+  },
+  "005": {
+    "product_id": "005",
+    "name": "Bread",
+    "price": 6.5,
+    "stock": 60
+  },
+  "006": {
+    "product_id": "006",
+    "name": "Egg",
+    "price": 12.0,
+    "stock": 30
+  },
+  "007": {
+    "product_id": "007",
+    "name": "Water",
+    "price": 2.0,
+    "stock": 200
+  },
+  "008": {
+    "product_id": "008",
+    "name": "Chocolate",
+    "price": 10.0,
+    "stock": 40
   }
 }
-
