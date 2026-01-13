@@ -17,39 +17,42 @@ def main_menu():
     print("          SUPERMARKET POS SYSTEM")
     print("="*50)
     print("  1. Process Sale")
-    print("  2. View Inventory")
-    print("  3. Exit System")
+    print("  2. Process Return")
+    print("  3. View Inventory")
+    print("  4. Exit System")
     print("="*50)
 
 def main():
     service = POSService()
-    
+
     while True:
         clear_screen()
         main_menu()
-        
+
         try:
             choice = input("\nSelect operation (1-3): ").strip()
-            
+
             if choice == '1':
                 clear_screen()
                 sale = service.process_sale()
                 if sale:
                     input("\nPress Enter to return to main menu...")
-            
+
+
             elif choice == '2':
                 clear_screen()
-                service.show_inventory()
-                input("\nPress Enter to return to main menu...")
-            
+                return_obj = service.start_return_process()
+                if return_obj:
+                    input("\nPress Enter to return to main menu...")
+
             elif choice == '3':
                 print("\nThank you for using POS System. Goodbye!")
                 sys.exit(0)
-            
+
             else:
                 print("Error: Invalid selection, please try again")
                 input("\nPress Enter to continue...")
-        
+
         except KeyboardInterrupt:
             print("\n\nProgram interrupted by user")
             sys.exit(0)
