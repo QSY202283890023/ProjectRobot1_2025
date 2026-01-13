@@ -150,15 +150,124 @@ class ReturnItem:
         with open(self.returns_file, 'w', encoding='utf-8') as f:
             json.dump(returns_data, f, ensure_ascii=False, indent=2)
 
-    def start_return_process(self):
-        """Start return process (basic framework)"""
+    def process_return(self):
+        """Process a complete return transaction"""
         print("\n" + "=" * 50)
         print("              PROCESS RETURN")
         print("=" * 50)
-        print("Return functionality under development...")
-        print("Full feature will be available in next version")
-        input("\nPress Enter to return...")
-        return None
+
+        # Check if sales data exists
+        if not os.path.exists(self.sales_file):
+            print("Error: No sales records found")
+            input("\nPress Enter to return...")
+            return None
+
+        with open(self.sales_file, 'r', encoding='utf-8') as f:
+            sales_data = json.load(f)
+
+        if not sales_data:
+            print("Error: No sales records available")
+            input("\nPress Enter to return...")
+            return None
+
+        print("Recent Sales Records:")
+        sale_ids = list(sales_data.keys())[-5:]  # Show last 5 sales
+        for sale_id in sale_ids:
+            sale = sales_data[sale_id]
+            print(f"  Sale ID: {sale_id}, Time: {sale['datetime'][:19]}, Amount: ${sale['total']:.2f}")
+
+        while True:
+            sale_id = input("\nEnter sale ID to return (or 'cancel'): ").strip()
+
+            if sale_id.lower() == 'cancel':
+                return None
+
+            if sale_id not in sales_data:
+                print("Error: Sale ID not found")
+                continue
+
+            original_sale = sales_data[sale_id]
+            break
+
+        # Generate return ID
+        return_id = f"RETURN-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8]}"
+        return_obj = Return(return_id, sale_id)
+
+        print(f"\nOriginal Sale Items:")
+        for i, item in enumerate(original_sale['items'], 1):
+            print(f"  {i}. {item['product_name']} × {item['quantity']} = ${item['subtotal']:.2f}")
+
+        while True:
+            print("\nEnter item number to return, 'done' to finish, 'cancel' to abort")
+            choice = input("Selection: ").strip()
+
+            if choice.lower() == 'done':
+                break
+            elif choice.lower() == 'cancel':
+                print("Return cancelled")
+                return None
+
+            try:
+                item_idx = int(choice) - 1
+                if item_idx < 0 or item_idx >= len(original_sale['items']):
+                    print("Error: Invalid item number")
+                    continue
+
+                original_item = original_sale['items'][item_idx]
+                product_id = original_item['product_id']
+
+                # Get product object
+                product = self.get_product_by_id(product_id)
+                if not product:
+                    print(f"Error: Product {original_item['product_name']} not found")
+                    continue
+
+                max_qty = original_item['quantity']
+                try:
+                    quantity = int(input(f"Enter return quantity (maximum {max_qty}): "))
+                    if quantity <= 0 or quantity > max_qty:
+                        print(f"Error: Quantity must be between 1 and {max_qty}")
+                        continue
+                except ValueError:
+                    print("Error: Please enter a valid number")
+                    continue
+
+                reason = input("Enter return reason: ").strip() or "General return"
+
+                # Add to return
+                return_obj.add_item(product, quantity, reason)
+                print(f"Added return: {product.name} × {quantity}")
+                print(f"Current Refund Amount: ${return_obj.refund_amount:.2f}")
+
+            except ValueError:
+                print("Error: Please enter a valid number")
+
+        if not return_obj.items:
+            print("No items added to return")
+            return None
+
+        # Show refund information
+        print(f"\nTotal Refund Amount: ${return_obj.refund_amount:.2f}")
+
+        # Confirm refund
+        confirm = input("Confirm refund? (y/n): ").lower()
+        if confirm != 'y':
+            print("Return cancelled")
+            return None
+
+        # Update inventory
+        for item in return_obj.items:
+            product = item.product
+            product.stock += item.quantity
+
+        # Save data
+        self._save_inventory(self.products)
+        self._save_return(return_obj)
+
+        # Print return receipt
+        return_obj.print_return_receipt()
+
+        return return_obj
 
 
 class Return:

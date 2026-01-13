@@ -39,9 +39,12 @@ def main():
                     input("\nPress Enter to return to main menu...")
 
 
+
+            # Change the return processing call
+
             elif choice == '2':
                 clear_screen()
-                return_obj = service.start_return_process()
+                return_obj = service.process_return()  # Changed from start_return_process
                 if return_obj:
                     input("\nPress Enter to return to main menu...")
 
