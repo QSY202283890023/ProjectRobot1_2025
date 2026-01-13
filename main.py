@@ -1,27 +1,61 @@
 """
-POS System - Day 1
-Project initialization and basic structure
+POS System - Day 2
+Complete sale processing functionality
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from services import POSService
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def main_menu():
+    print("\n" + "="*50)
+    print("          SUPERMARKET POS SYSTEM")
+    print("="*50)
+    print("  1. Process Sale")
+    print("  2. View Inventory")
+    print("  3. Exit System")
+    print("="*50)
+
 def main():
-    print("Welcome to Supermarket POS System")
-    print("System is initializing...")
-    print("Features will be added in subsequent versions")
-
+    service = POSService()
+    
     while True:
-        print("\n=== MAIN MENU ===")
-        print("1. View Products")
-        print("2. Exit System")
-
-        choice = input("Please select: ")
-
-        if choice == "1":
-            print("\nProduct list feature under development...")
-        elif choice == "2":
-            print("Thank you for using our system. Goodbye!")
-            break
-        else:
-            print("Invalid choice, please try again")
+        clear_screen()
+        main_menu()
+        
+        try:
+            choice = input("\nSelect operation (1-3): ").strip()
+            
+            if choice == '1':
+                clear_screen()
+                sale = service.process_sale()
+                if sale:
+                    input("\nPress Enter to return to main menu...")
+            
+            elif choice == '2':
+                clear_screen()
+                service.show_inventory()
+                input("\nPress Enter to return to main menu...")
+            
+            elif choice == '3':
+                print("\nThank you for using POS System. Goodbye!")
+                sys.exit(0)
+            
+            else:
+                print("Error: Invalid selection, please try again")
+                input("\nPress Enter to continue...")
+        
+        except KeyboardInterrupt:
+            print("\n\nProgram interrupted by user")
+            sys.exit(0)
+        except Exception as e:
+            print(f"\nError occurred: {e}")
+            input("\nPress Enter to continue...")
 
 if __name__ == "__main__":
     main()
